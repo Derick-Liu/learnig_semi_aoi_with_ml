@@ -1,0 +1,31 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+.aoi-ml/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Model outputs
+outputs/models/*.pth
+outputs/models/*.joblib
+
+# Large generated dataset
+data/train/
+data/test/
+data/masks/
+data/labels.csv
