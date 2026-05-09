@@ -200,16 +200,98 @@ python -m src.visualization.visualize_predictions
 
 # 📂 Project Structure
 
-```bash
-src/
-├── config.py
-├── paths.py
+```text
+learnig_semi_aoi_with_ml/
 │
 ├── data/
-├── models/
-├── training/
-├── visualization/
-├── utils/
+│   ├── raw/
+│   │   └── golden_reference.png
+│   │
+│   ├── train/
+│   │   ├── normal/
+│   │   └── defect/
+│   │
+│   ├── test/
+│   │   ├── normal/
+│   │   └── defect/
+│   │
+│   ├── masks/
+│   └── labels.csv
+│
+├── outputs/
+│   ├── figures/
+│   │   ├── sample_dataset.png
+│   │   ├── defect_overlay.png
+│   │   ├── baseline_confusion_matrix.png
+│   │   ├── cnn_confusion_matrix.png
+│   │   ├── cnn_training_curve.png
+│   │   └── cnn_prediction_examples.png
+│   │
+│   └── models/
+│       ├── baseline_random_forest.joblib
+│       └── cnn_aoi_model.pth
+│
+├── src/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── paths.py
+│   │
+│   ├── data/
+│   │   ├── aoi_dataset.py
+│   │   ├── create_labels.py
+│   │   ├── generate_defect.py
+│   │   ├── generate_normal.py
+│   │   └── generate_reference.py
+│   │
+│   ├── models/
+│   │   ├── baseline.py
+│   │   └── cnn.py
+│   │
+│   ├── training/
+│   │   ├── train_baseline.py
+│   │   └── train_cnn.py
+│   │
+│   ├── visualization/
+│   │   ├── visualize_dataset.py
+│   │   ├── visualize_defect_overlay.py
+│   │   └── visualize_predictions.py
+│   │
+│   └── utils/
+│       └── image_utils.py
+│
+├── README.md
+├── requirements.txt
+└── .gitignore
+```
+
+本專案採用模組化架構。  
+`src/data` 負責合成 AOI 資料生成，`src/models` 定義 ML 與 CNN 模型，`src/training` 負責模型訓練與評估，`src/visualization` 則產生分析與展示用圖表。
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+flowchart TD
+    A[Golden Reference Generation] --> B[Normal Image Generation]
+    A --> C[Defect Image Generation + Mask]
+
+    B --> D[Label Construction]
+    C --> D
+
+    D --> E[Baseline ML Training<br/>Random Forest]
+    D --> F[CNN Training<br/>PyTorch]
+
+    E --> G[Model Evaluation]
+    F --> G
+
+    G --> H[Visualization Outputs]
+
+    H --> I[Dataset Samples]
+    H --> J[Defect Mask Overlay]
+    H --> K[Confusion Matrix]
+    H --> L[Training Curve]
+    H --> M[Prediction Examples]
 ```
 
 ---
