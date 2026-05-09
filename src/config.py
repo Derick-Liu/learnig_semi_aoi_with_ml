@@ -1,0 +1,22 @@
+IMAGE_SIZE = 128
+BATCH_SIZE = 16
+EPOCHS = 10
+LEARNING_RATE = 0.001
+
+REFERENCE_IMAGE_SIZE = 512
+
+TRAIN_NORMAL_COUNT = 100
+TEST_NORMAL_COUNT = 20
+TRAIN_DEFECT_COUNT = 100
+TEST_DEFECT_COUNT = 20
+
+RANDOM_SEED = 42
+
+DEFECT_TYPES = [
+    "scratch",
+    "particle",
+    "open_circuit",
+    "bridge",
+    "missing_pad",
+    "stain"
+]

@@ -1,33 +1,42 @@
-# Synthetic Semiconductor AOI Defect Detection (Python + Machine Learning)
+# Synthetic Semiconductor AOI Defect Detection  
+**Python / OpenCV / PyTorch / Scikit-learn**
+
+模組化的機器學習流程，利用合成資料產生和深度學習來模擬半導體AOI（自動光學檢測）。
+
+A modular machine learning pipeline that simulates semiconductor AOI (Automated Optical Inspection) using synthetic data generation and deep learning.
 
 本專案以 Python 為核心，模擬半導體 AOI（Automated Optical Inspection）檢測流程，透過合成影像資料（synthetic dataset）建立完整的 Machine Learning pipeline，包含資料生成、缺陷模擬、模型訓練與視覺化分析。
-
-This project simulates a semiconductor AOI inspection workflow using synthetic image generation and machine learning models.
 
 ---
 
 # Project Overview（專案概述）
 
-本專案目標：
+本專案模擬半導體 AOI 缺陷檢測流程，從 **資料生成 → 模型訓練 → 視覺化分析** 建立完整 pipeline。
 
-- 模擬半導體 AOI 缺陷檢測流程
-- 建立可控的 synthetic dataset
-- 訓練 Machine Learning 與 CNN 模型
-- 視覺化模型結果與缺陷分析
+核心目標：
 
-核心流程：
+- 模擬 AOI 檢測流程（無真實資料情況）
+- 建立 synthetic dataset
+- 訓練 ML + CNN 模型
+- 提供可解釋的視覺化分析
 
-Golden Reference Image
+---
+
+# System Architecture
+
+Golden Reference
 ↓
-Normal Dataset Generation
+Normal Data Generation
 ↓
-Defect Dataset Generation (with masks)
+Defect Simulation + Mask
+↓
+Label Construction
 ↓
 Baseline ML (Random Forest)
 ↓
-CNN Model (PyTorch)
+CNN (PyTorch)
 ↓
-Visualization & Analysis
+Evaluation + Visualization
 
 ---
 
@@ -48,35 +57,44 @@ In real-world semiconductor manufacturing, AOI systems detect defects that may i
 
 # Dataset Generation（資料生成）
 
-本專案不使用真實晶圓資料，而是使用 Python 合成影像：
+本專案完全使用 Python 合成資料（無需外部 dataset）
 
-## 1️⃣ Golden Reference
+## ✔ Golden Reference
+- 模擬晶片線路與 pads
+- 作為所有資料的基底
 
-- 建立無瑕疵標準影像
-- 模擬規則線路與元件結構
+## ✔ Normal Images
+- Brightness variation
+- Noise injection
+- Blur & spatial shift
 
-## 2️⃣ Normal Dataset
+## ✔ Defect Images
+隨機生成 6 種 AOI 常見缺陷：
 
-- 加入 brightness / noise / blur / shift
-- 模擬正常製程變動
+| Defect Type | Description |
+|---|---|
+| Scratch | 表面刮痕 |
+| Particle | 顆粒污染 |
+| Open Circuit | 線路斷裂 |
+| Bridge | 線路短路 |
+| Missing Pad | 元件缺失 |
+| Stain | 局部污染 |
 
-## 3️⃣ Defect Dataset
-
-- 隨機生成缺陷
-- 同時產生 defect mask（位置標註）
+同時產生：
+- defect image
+- pixel-level mask（可擴展 segmentation）
 
 ---
 
-# Defect Types（缺陷類型）
+# Models
 
-| 類型 | 說明 |
-|---|---|
-| scratch | 表面刮痕 |
-| particle | 污染顆粒 |
-| open_circuit | 線路斷裂 |
-| bridge | 線路短路 |
-| missing_pad | 元件缺失 |
-| stain | 局部污染 |
+## 🔹 Baseline Model
+- Random Forest (Scikit-learn)
+- 使用手工特徵（intensity, edges）
+
+## 🔹 CNN Model
+- PyTorch implementation
+- 自動學習影像特徵（edge / texture / defect pattern）
 
 ---
 
@@ -106,19 +124,15 @@ In real-world semiconductor manufacturing, AOI systems detect defects that may i
 
 ---
 
-# Results（結果分析）
+# 📊 Results
 
-## CNN Confusion Matrix
+## ✔ Performance
 
-![CNN Confusion Matrix](outputs/figures/cnn_confusion_matrix.png)
+- Accuracy: **95%**
+- Defect Recall: **100%**
+- False Negative: **0**
 
-模型結果：
-
-- Accuracy: 95%
-- Defect Recall: 100%
-- 無漏檢（No False Negative）
-
-👉 在 AOI 中，避免漏檢 defect 比誤判 normal 更重要
+在 AOI 中，**避免漏檢 defect 是關鍵指標**
 
 ---
 
@@ -128,97 +142,108 @@ In real-world semiconductor manufacturing, AOI systems detect defects that may i
 
 ---
 
+## Confusion Matrix
+
+![Confusion Matrix](outputs/figures/cnn_confusion_matrix.png)
+
+---
+
 ## Prediction Examples
 
 ![Prediction Examples](outputs/figures/cnn_prediction_examples.png)
 
-可視化模型預測結果，包含：
-
-- 正確預測（Correct）
-- 錯誤預測（Wrong）
-- 信心值（Confidence）
+- 顯示 Correct / Wrong cases
+- 包含 confidence score
+- 分析模型錯誤模式
 
 ---
 
-# How to Run（如何執行）
+## Defect Overlay
 
-## 1️⃣ 安裝環境
+![Defect Overlay](outputs/figures/defect_overlay.png)
+
+---
+
+# How to Run
+
+## 1️⃣ Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 2️⃣ 生成資料
+## 2️⃣ Generate dataset
 
 ```bash
-python src/generate_reference.py
-python src/generate_normal_dataset.py
-python src/generate_defect_dataset.py
-python src/create_labels.py
+python -m src.data.generate_reference
+python -m src.data.generate_normal
+python -m src.data.generate_defect
+python -m src.data.create_labels
 ```
 
-## 3️⃣ 訓練模型
+## 3️⃣ Train models
 
 ```bash
-python src/train_baseline.py
-python src/train_cnn.py
+python -m src.training.train_baseline
+python -m src.training.train_cnn
 ```
 
-## 4️⃣ 視覺化結果
+## 4️⃣ Visualization
 
 ```bash
-python src/visualize_dataset.py
-python src/visualize_defect_overlay.py
-python src/visualize_cnn_predictions.py
+python -m src.visualization.visualize_dataset
+python -m src.visualization.visualize_defect_overlay
+python -m src.visualization.visualize_predictions
 ```
 
 ---
 
-# Project Structure
+# 📂 Project Structure
 
 ```bash
-learnig_semi_aoi_with_ml/
+src/
+├── config.py
+├── paths.py
 │
 ├── data/
-│   ├── raw/
-│   ├── train/
-│   ├── test/
-│   ├── masks/
-│   └── labels.csv
-│
-├── outputs/
-│   ├── figures/
-│   └── models/
-│
-├── src/
-│
-├── README.md
-├── requirements.txt
-└── .gitignore
+├── models/
+├── training/
+├── visualization/
+├── utils/
 ```
 
 ---
 
-# Future Improvements（未來改進）
+# Engineering Highlights
 
-- 增加更細微的 defect（hard cases）
-- 加入 defect classification（多分類）
-- 使用 YOLO / segmentation 做 defect localization
-- 加入真實 AOI dataset（若可取得）
-- 建立 Web UI（例如 Django 或 Streamlit）
+- Modular ML pipeline (data / model / training / visualization separation)
+- Config-driven design (centralized hyperparameters)
+- Reproducible dataset generation (fixed random seed)
+- Scalable architecture for future extension (multi-class / detection / segmentation)
+- End-to-end pipeline without external dataset
 
 ---
 
-# Learning Note（學習說明）
+# Future Work
 
-本專案為自學專案，過程中：
+- Multi-class defect classification
+- Defect localization (bounding box / segmentation)
+- Hard-case dataset generation (low contrast defects)
+- Integration with real AOI dataset
+- Web demo (Streamlit / Django)
 
-- 使用 Python 建立影像處理與 ML pipeline
-- 結合 Computer Vision 與 Deep Learning
-- 藉由 ChatGPT 協助理解 AOI、CNN 與實作流程
-- 從零完成一個完整的 AI 專案
+---
 
-This project was developed as a self-learning project, with guidance and conceptual support from ChatGPT to understand AOI systems and machine learning workflows.
+# Learning Notes
+
+本專案為自學實作：
+
+- 從零建立 Machine Learning pipeline
+- 深入理解 AOI 檢測邏輯
+- 使用 PyTorch 建立 CNN 模型
+- 透過 ChatGPT 輔助學習與設計架構
+
+This project was developed as a self-learning project with conceptual guidance from ChatGPT.
 
 ---
 
